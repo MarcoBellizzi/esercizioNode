@@ -1,0 +1,418 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Fruit sales project",
+        "description": "My Project Application API"
+    },
+    "host": "localhost:3000",
+    "basePath": "/api/v1",
+    "tags": [
+        {
+            "name": "Users",
+            "description": "API for users in the system"
+        },
+        {
+            "name": "Admins",
+            "description": "API for admins in the system"
+        }
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "definitions": {
+        "UserCredential": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "FruitSimple": {
+            "required": [
+                "name",
+                "price"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "Fruit": {
+            "required": [
+                "_id",
+                "name",
+                "price"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "Fruits": {
+            "required": [
+                "fruits"
+            ],
+            "properties": {
+                "fruits": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "fruit": {
+                                "type": "string"
+                            },
+                            "quantity": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+            }
+            
+        },
+        "Id": {
+            "required": [
+                "_id"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "paths": {
+        "/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all users in the system",
+                "responses": {
+                    "200": {
+                        "description": "Returns 200 Ok"
+                    }
+                }
+            }
+        },
+        "/users/add": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Add a users in the system",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User credential",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserCredential"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Returns 400 Bad Request if there is not a valid email or a password in the body or the user is already registered"
+                    },
+                    "201": {
+                        "description": "Returns 201 Created if valid inputs are given"
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Logs the user and return a token",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User credential",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserCredential"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Returns 400 Bad Request if there is not a user register with the provided email"
+                    },
+                    "401": {
+                        "description": "Return 401 Unauthorized if the password is not correct"
+                    },
+                    "200": {
+                        "description": "Returns 200 Ok if valid inputs are given, and adds a cookie with the refresh token if an admin is logged"
+                    }
+                }
+            }
+        },
+        "/users/refresh": {
+            "post": {
+                "tags": [
+                    "Admins"
+                ],
+                "summary": "Refresh the token",
+                "responses": {
+                    "200": {
+                        "description": "Returns 200 Ok if a cookie is present"
+                    },
+                    "401": {
+                        "description": "Return 401 Bad Request if the refresh token in the cookie is invalid"
+                    },
+                    "403": {
+                        "description": "Returns 403 Forbitten if the user is not an Admin"
+                    }
+                }
+            }
+        },
+        "/fruits": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all fruits in the system",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Validation token",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return 200 Ok"
+                    }
+                }
+            }
+        },
+        "/fruits/add": {
+            "post": {
+                "tags": [
+                    "Admins"
+                ],
+                "summary": "Add a fruit in the system",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Validation token",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User credential",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/FruitSimple"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Return 201 Created if valid inputs are given"
+                    },
+                    "400": {
+                        "description": "Returns 400 Bad Request if there is not a name or a price in the body or the fruit is already registered"
+                    },
+                    "403": {
+                        "description": "Returns 403 Forbidden if the user is not an Admin"
+                    }
+                }
+            }
+        },
+        "/fruits/delete": {
+            "delete": {
+                "tags": [
+                    "Admins"
+                ],
+                "summary": "Delete a fruit in the system",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Validation token",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User credential",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return 200 Ok if valid inputs are given"
+                    },
+                    "400": {
+                        "description": "Returns 400 Bad Request if there is not the id of the fruit or there is not a fruit with that id"
+                    },
+                    "403": {
+                        "description": "Returns 403 Forbidden if the user is not an Admin"
+                    }
+                }
+            }
+        },
+        "/fruits/update": {
+            "put": {
+                "tags": [
+                    "Admins"
+                ],
+                "summary": "Update a fruit in the system",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Validation token",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User credential",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Fruit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return 200 Ok if valid inputs are given"
+                    },
+                    "400": {
+                        "description": "Returns 400 Bad Request if there is not the id, the name or the price of the fruit or there is not a fruit with that id"
+                    },
+                    "403": {
+                        "description": "Returns 403 Forbidden if the user is not an Admin"
+                    }
+                }
+            }
+        },
+        "/sales": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all the saled done by the user",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Validation token",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return 200 Ok if valid token is given"
+                    }
+                }
+            }
+        },
+        "/sales/history/{email}": {
+            "get": {
+                "tags": [
+                    "Admins"
+                ],
+                "summary": "Get all the sales done by the selected user",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Validation token",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "email",
+                        "in": "parameters",
+                        "description": "Email of the user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return 200 Ok if valid token is given"
+                    },
+                    "403": {
+                        "description": "Returns 403 Forbidden if the user is not an Admin"
+                    }
+                }
+            }
+        },
+        "/sales/add": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Add a new sale of any products by the user",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Validation token",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User credential",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Fruits"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Return 201 Created if valid token is given"
+                    },
+                    "400": {
+                        "description": "Returns 400 Bad Request if not valid inputs are given"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,40 @@
+FATTI
+
+- generare gli id (libreria esterna)
+
+- inserire mongo-db
+
+- utilizzare un api che costruisca l'endpoint (integrare swagger)
+
+- scadenza token (se admin faccio refresh token (rimane loggato))
+
+- integrare docker (dockerizzare l'immagine)
+
+
+
+
+npm init -y
+
+npm i express
+npm i fs
+npm i jsonwebtoken
+npm i mongodb@4.10
+npm i uuid
+npm i swagger-ui-express -S
+npm i express cookie-parser
+
+node app.js
+
+
+
+
+
+docker pull mongo
+
+docker build . -t node-web-app
+
+docker network create mynetwork
+
+docker run --name mongodb -d --network mynetwork --network-alias mongodb mongo
+
+docker run --name node-web-app -d -p 3000:3000 --network mynetwork node-web-app
